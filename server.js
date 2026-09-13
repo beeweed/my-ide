@@ -124,6 +124,7 @@ wss.on('connection', (ws) => {
 });
 
 server.listen(PORT, () => {
+  if (process.env.MYC_QUIET) return; // `myc` CLI prints only the URL itself
   console.log(`Mobile terminal listening on http://localhost:${PORT}`);
   console.log('Open it on your phone (same network / forwarded port) and tap the terminal.');
 });

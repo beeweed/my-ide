@@ -4,6 +4,26 @@
   "description": "Mobile-friendly cloud terminal built with full xterm.js + touch key bar (Ctrl, Alt, arrows, etc.) for phones that can't use cloud VS Code's terminal",
   "type": "module",
   "main": "server.js",
+  "bin": {
+    "myc": "bin/myc.js"
+  },
+  "files": [
+    "bin/",
+    "public/",
+    "server.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "terminal",
+    "xterm",
+    "xterm.js",
+    "mobile",
+    "cloud",
+    "pty",
+    "cli"
+  ],
+  "license": "MIT",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
