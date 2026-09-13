@@ -11,6 +11,12 @@ delete, Ctrl+C/D/Z/…, F1–F12, programming symbols) next to it.
 npm install -g my-ide-mobile-terminal
 myc
 ```
+or
+
+```bash
+npm install -g --allow-scripts=node-pty my-ide-mobile-terminal
+myc
+```
 
 `myc` starts the app and prints only the frontend URL, e.g.
 `http://localhost:3000`. Options: `myc --port 4000`, `myc --help`.
