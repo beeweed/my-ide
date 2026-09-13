@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0b0e14" />
+  <title>Mobile Terminal — cloud VS Code companion</title>
+  <link rel="stylesheet" href="/xterm/xterm.css" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header id="topbar">
+    <span id="status-dot" class="disconnected" title="connection status"></span>
+    <strong id="title">📱 Mobile Terminal</strong>
+    <span id="status-text">connecting…</span>
+    <span class="spacer"></span>
+    <button id="btn-search" title="Search terminal output">🔍</button>
+    <button id="btn-clear" title="Clear screen">🧹</button>
+    <button id="btn-keyboard" title="Open phone keyboard">⌨️</button>
+    <button id="btn-reconnect" title="Reconnect">↻</button>
+  </header>
+
+  <!-- one-tap programming symbols (phone keyboards hide these) -->
+  <nav id="symbolbar" aria-label="Quick symbols">
+    <button data-insert="|">|</button>
+    <button data-insert="/">/</button>
+    <button data-insert="\">&#92;</button>
+    <button data-insert="-">-</button>
+    <button data-insert="_">_</button>
+    <button data-insert=":">:</button>
+    <button data-insert=";">;</button>
+    <button data-insert="~">~</button>
+    <button data-insert="`">`</button>
+    <button data-insert="&quot;">&quot;</button>
+    <button data-insert="'">'</button>
+    <button data-insert="(">(</button>
+    <button data-insert=")">)</button>
+    <button data-insert="{">{</button>
+    <button data-insert="}">}</button>
+    <button data-insert="[">[</button>
+    <button data-insert="]">]</button>
+    <button data-insert="*">*</button>
+    <button data-insert="&">&amp;</button>
+    <button data-insert="?">?</button>
+    <button data-insert="!">!</button>
+    <button data-insert="$">$</button>
+    <button data-insert="^">^</button>
+    <button data-insert="=">=</button>
+    <button data-insert="+">+</button>
+    <button data-insert="%">%</button>
+    <button data-insert="#">#</button>
+    <button data-insert="@">@</button>
+    <button data-insert=" ">␣</button>
+  </nav>
+
+  <div id="searchbar" hidden>
+    <input id="search-input" type="search" placeholder="Search output…" enterkeyhint="search" />
+    <button id="search-prev">▲</button>
+    <button id="search-next">▼</button>
+    <button id="search-close">✕</button>
+  </div>
+
+  <main id="layout">
+    <!-- LEFT: full PC key bar for touch users -->
+    <aside id="keybar" aria-label="PC keys">
+      <div class="key-group">
+        <div class="key-label">MOD</div>
+        <button class="key sticky" id="key-ctrl" title="Ctrl (tap, then tap a letter)">CTRL</button>
+        <button class="key sticky" id="key-alt" title="Alt/Option (tap, then tap a key)">ALT</button>
+        <button class="key sticky" id="key-shift" title="Shift (uppercases next letter)">⇧</button>
+        <button class="key" data-send="&#27;" title="Escape">ESC</button>
+        <button class="key" data-send="&#9;" title="Tab">TAB ⇥</button>
+      </div>
+
+      <div class="key-group">
+        <div class="key-label">ARROWS</div>
+        <div class="arrows">
+          <span></span><button class="key" data-send="&#27;[A" title="Up">▲</button><span></span>
+          <button class="key" data-send="&#27;[D" title="Left">◀</button><button class="key" data-send="&#27;[B" title="Down">▼</button><button class="key" data-send="&#27;[C" title="Right">▶</button>
+        </div>
+      </div>
+
+      <div class="key-group">
+        <div class="key-label">NAV</div>
+        <button class="key" data-send="&#27;[H" title="Home">HOME</button>
+        <button class="key" data-send="&#27;[F" title="End">END</button>
+        <button class="key" data-send="&#27;[5~" title="Page Up">PGUP</button>
+        <button class="key" data-send="&#27;[6~" title="Page Down">PGDN</button>
+      </div>
+
+      <div class="key-group">
+        <div class="key-label">EDIT</div>
+        <button class="key wide" data-send="" title="Backspace">⌫ BKSP</button>
+        <button class="key" data-send="&#27;[3~" title="Delete">DEL</button>
+        <button class="key" data-send="&#27;[2~" title="Insert">INS</button>
+        <button class="key wide" data-send="" title="Enter">⏎ ENTER</button>
+      </div>
+
+      <div class="key-group">
+        <div class="key-label">CTRL+</div>
+        <button class="key" data-send="" title="Ctrl+C — interrupt">C</button>
+        <button class="key" data-send="" title="Ctrl+D — EOF / logout">D</button>
+        <button class="key" data-send="" title="Ctrl+Z — suspend">Z</button>
+        <button class="key" data-send="" title="Ctrl+L — clear">L</button>
+        <button class="key" data-send="" title="Ctrl+R — history search">R</button>
+        <button class="key" data-send="" title="Ctrl+U — kill line">U</button>
+        <button class="key" data-send="" title="Ctrl+K — kill to end">K</button>
+        <button class="key" data-send="" title="Ctrl+A — start of line">A</button>
+        <button class="key" data-send="" title="Ctrl+E — end of line">E</button>
+      </div>
+
+      <details class="key-group" id="fkeys">
+        <summary>F1–F12</summary>
+        <div class="fkey-grid">
+          <button class="key" data-send="&#27;OP">F1</button>
+          <button class="key" data-send="&#27;OQ">F2</button>
+          <button class="key" data-send="&#27;OR">F3</button>
+          <button class="key" data-send="&#27;OS">F4</button>
+          <button class="key" data-send="&#27;[15~">F5</button>
+          <button class="key" data-send="&#27;[17~">F6</button>
+          <button class="key" data-send="&#27;[18~">F7</button>
+          <button class="key" data-send="&#27;[19~">F8</button>
+          <button class="key" data-send="&#27;[20~">F9</button>
+          <button class="key" data-send="&#27;[21~">F10</button>
+          <button class="key" data-send="&#27;[23~">F11</button>
+          <button class="key" data-send="&#27;[24~">F12</button>
+        </div>
+      </details>
+    </aside>
+
+    <!-- MIDDLE: the terminal -->
+    <section id="terminal-wrap">
+      <div id="terminal" aria-label="Terminal. Tap to focus, then use phone keyboard or side keys."></div>
+      <div id="tap-hint">👆 tap here to type</div>
+      <!-- hidden input summons the OS keyboard on phones; its text is forwarded to the pty -->
+      <input id="kbd-proxy" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+             aria-label="Phone keyboard input" />
+    </section>
+  </main>
+
+  <footer id="bottombar">
+    <button id="btn-kbd2" title="Toggle phone keyboard">⌨️ Keys</button>
+    <button data-send="&#9;" title="Tab">⇥</button>
+    <button data-send="&#27;" title="Esc">ESC</button>
+    <button data-send="|" title="Pipe">|</button>
+    <button data-send="~" title="Tilde">~</button>
+    <button data-send="/" title="Slash">/</button>
+    <button data-send="" title="Ctrl+C">^C</button>
+    <button data-send="" title="Enter">⏎</button>
+    <button data-send="" title="Backspace">⌫</button>
+  </footer>
+
+  <!-- FULL xterm.js stack, every installed package is loaded (nothing left out) -->
+  <script src="/xterm/xterm.js"></script>
+  <script src="/xterm/addon-attach.js"></script>
+  <script src="/xterm/addon-fit.js"></script>
+  <script src="/xterm/addon-search.js"></script>
+  <script src="/xterm/addon-serialize.js"></script>
+  <script src="/xterm/addon-unicode11.js"></script>
+  <script src="/xterm/addon-web-links.js"></script>
+  <script src="/xterm/addon-webgl.js"></script>
+  <script src="/xterm/addon-canvas.js"></script>
+  <script src="/xterm/addon-image.js"></script>
+  <script src="/xterm/addon-progress.js"></script>
+  <script src="/terminal.js"></script>
+</body>
+</html>

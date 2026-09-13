@@ -1,0 +1,249 @@
+:root {
+  --bg: #0b0e14;
+  --panel: #131722;
+  --panel-2: #1a2030;
+  --border: #2a3348;
+  --text: #e6e9f0;
+  --dim: #8b93a7;
+  --accent: #4cc38a;
+  --accent-dim: #1f3d31;
+  --danger: #ff5f56;
+  --key-h: 44px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ---------- top bar ---------- */
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  min-height: 48px;
+}
+#topbar .spacer { flex: 1; }
+#status-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--danger);
+  flex: none;
+}
+#status-dot.connected { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+#status-text { color: var(--dim); font-size: 12px; }
+#topbar button {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 16px;
+  min-width: 40px;
+  min-height: 36px;
+}
+
+/* ---------- symbol quick bar ---------- */
+#symbolbar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 8px;
+  background: #0e1220;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
+}
+#symbolbar::-webkit-scrollbar { display: none; }
+#symbolbar button {
+  flex: none;
+  min-width: 40px;
+  min-height: 36px;
+  font-size: 16px;
+  font-family: ui-monospace, monospace;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ---------- search ---------- */
+#searchbar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+#searchbar[hidden] { display: none; }
+#search-input {
+  flex: 1;
+  background: #0e1220;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 16px; /* >=16px prevents iOS auto-zoom */
+}
+#searchbar button {
+  min-width: 44px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* ---------- main layout: LEFT keys + MIDDLE terminal ---------- */
+#layout {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+}
+
+#keybar {
+  width: 92px;
+  flex: none;
+  overflow-y: auto;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 8px 6px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.key-group { display: flex; flex-direction: column; gap: 6px; }
+.key-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  text-align: center;
+}
+
+.key {
+  min-height: var(--key-h);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  touch-action: manipulation;
+  user-select: none;
+}
+.key:active { background: #2a3552; }
+.key.wide { min-height: 52px; }
+.key.sticky.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.arrows {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+}
+.arrows .key { min-height: 40px; font-size: 14px; }
+
+#fkeys summary {
+  text-align: center;
+  font-size: 11px;
+  color: var(--dim);
+  padding: 6px;
+  cursor: pointer;
+}
+.fkey-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.fkey-grid .key { min-height: 40px; font-size: 12px; }
+
+/* ---------- terminal (middle) ---------- */
+#terminal-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background: #000;
+  display: flex;
+}
+#terminal {
+  flex: 1;
+  padding: 6px 0 6px 8px;
+  overflow: hidden;
+}
+#terminal .xterm { height: 100%; }
+
+#tap-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(20, 26, 40, 0.9);
+  border: 1px solid var(--border);
+  color: var(--dim);
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+#tap-hint.gone { opacity: 0; }
+
+/* invisible but focusable: summons the phone keyboard */
+#kbd-proxy {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  width: 4px;
+  height: 4px;
+  opacity: 0.01;
+  border: none;
+  padding: 0;
+  font-size: 16px; /* stops iOS zoom */
+}
+
+/* ---------- bottom thumb bar ---------- */
+#bottombar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+}
+#bottombar button {
+  flex: 1 0 auto;
+  min-width: 52px;
+  min-height: 44px;
+  font-size: 16px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  touch-action: manipulation;
+}
+#bottombar button:active { background: #2a3552; }
+
+/* larger phones / landscape: roomier keys */
+@media (min-width: 700px) {
+  #keybar { width: 120px; }
+  .key { font-size: 14px; }
+}

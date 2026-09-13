@@ -1,0 +1,28 @@
+{
+  "name": "my-ide-mobile-terminal",
+  "version": "1.0.0",
+  "description": "Mobile-friendly cloud terminal built with full xterm.js + touch key bar (Ctrl, Alt, arrows, etc.) for phones that can't use cloud VS Code's terminal",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@xterm/addon-attach": "^0.11.0",
+    "@xterm/addon-canvas": "^0.7.0",
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/addon-image": "^0.9.0",
+    "@xterm/addon-progress": "^0.2.0",
+    "@xterm/addon-search": "^0.15.0",
+    "@xterm/addon-serialize": "^0.13.0",
+    "@xterm/addon-unicode11": "^0.8.0",
+    "@xterm/addon-web-links": "^0.11.0",
+    "@xterm/addon-webgl": "^0.18.0",
+    "@xterm/headless": "^5.5.0",
+    "@xterm/xterm": "^5.5.0",
+    "express": "^4.19.2",
+    "node-pty": "^1.0.0",
+    "ws": "^8.18.0"
+  }
+}
