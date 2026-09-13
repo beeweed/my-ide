@@ -37,7 +37,11 @@
   const searchAddon = new SearchAddon.SearchAddon();
   const serializeAddon = new SerializeAddon.SerializeAddon();
   const unicode11 = new Unicode11Addon.Unicode11Addon();
-  const webLinks = new WebLinksAddon.WebLinksAddon();
+  // links: auto-detect URLs, tap one to open it in a new browser tab
+  const webLinks = new WebLinksAddon.WebLinksAddon((event, uri) => {
+    try { event.preventDefault(); } catch {}
+    window.open(uri, '_blank', 'noopener');
+  }, { hover: true });
   const attachAddon = null; // we speak JSON {type,input/resize} so we wire the socket manually
   void attachAddon;
 
@@ -264,7 +268,11 @@
     }
   });
 
-  termEl.addEventListener('click', () => { hideHint(); openKeyboard(); });
+  termEl.addEventListener('click', () => {
+    if (selectMode) return; // taps are for selection, not typing
+    hideHint();
+    openKeyboard();
+  });
   document.getElementById('btn-keyboard').addEventListener('click', openKeyboard);
   document.getElementById('btn-kbd2').addEventListener('click', () => {
     if (document.activeElement === kbdProxy) kbdProxy.blur();
@@ -311,6 +319,123 @@
   });
   document.getElementById('search-next').addEventListener('click', () => searchAddon.findNext(searchInput.value));
   document.getElementById('search-prev').addEventListener('click', () => searchAddon.findPrevious(searchInput.value));
+
+  // ---------- touch selection + copy + paste ----------
+  const toastEl = document.getElementById('toast');
+  const btnSelect = document.getElementById('btn-select');
+  let toastTimer = 0;
+  let selectMode = false;
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  }
+
+  function setSelectMode(on) {
+    selectMode = on;
+    document.body.classList.toggle('selecting', on);
+    btnSelect.classList.toggle('active', on);
+    btnSelect.setAttribute('aria-pressed', String(on));
+    if (!on) kbdProxy.blur();
+    toast(on ? 'Select mode: drag on the terminal to select' : 'Select mode off');
+    term.focus();
+  }
+  btnSelect.addEventListener('click', () => setSelectMode(!selectMode));
+
+  // Phones don't send mouse drags, so in select mode we translate touch
+  // drags into the mouse events xterm's selection manager listens for.
+  // Events are dispatched on the element under the finger (same target a
+  // real mouse event would hit) and bubble up to xterm's listeners.
+  function fireMouse(type, touch) {
+    const target = document.elementFromPoint(touch.clientX, touch.clientY) || termEl;
+    const ev = new MouseEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      button: 0,
+      buttons: type === 'mouseup' ? 0 : 1,
+    });
+    target.dispatchEvent(ev);
+  }
+  termEl.addEventListener('touchstart', (e) => {
+    if (!selectMode || e.touches.length !== 1) return;
+    e.preventDefault();
+    fireMouse('mousedown', e.touches[0]);
+  }, { passive: false });
+  termEl.addEventListener('touchmove', (e) => {
+    if (!selectMode || e.touches.length !== 1) return;
+    e.preventDefault();
+    fireMouse('mousemove', e.touches[0]);
+  }, { passive: false });
+  termEl.addEventListener('touchend', (e) => {
+    if (!selectMode) return;
+    e.preventDefault();
+    fireMouse('mouseup', e.changedTouches[0]);
+  }, { passive: false });
+
+  document.getElementById('btn-select-all').addEventListener('click', () => {
+    term.selectAll();
+    term.focus();
+    toast('All selected — tap 📋 to copy');
+  });
+
+  async function copySelection() {
+    const text = term.getSelection();
+    if (!text) {
+      toast('Nothing selected — turn on ✂️ and drag, or tap ⧉');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Copied ✓');
+    } catch {
+      // clipboard API needs a secure context; fallback for plain-http LAN use
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        toast(ok ? 'Copied ✓' : 'Copy failed');
+      } catch {
+        toast('Copy failed');
+      }
+    }
+    term.focus();
+  }
+  document.getElementById('btn-copy').addEventListener('click', copySelection);
+
+  // desktop convenience: right-click copies the selection
+  termEl.addEventListener('contextmenu', (e) => {
+    if (term.hasSelection()) {
+      e.preventDefault();
+      copySelection();
+    }
+  });
+
+  async function pasteClipboard() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        sendInput(text);
+        toast('Pasted');
+      } else {
+        toast('Clipboard is empty');
+      }
+    } catch {
+      toast('Clipboard blocked — open ⌨️ and paste there');
+      openKeyboard();
+    }
+    term.focus();
+  }
+  document.getElementById('btn-paste').addEventListener('click', pasteClipboard);
 
   // ---------- resize ----------
   function refit() {

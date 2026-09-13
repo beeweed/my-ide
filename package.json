@@ -1,6 +1,6 @@
 {
   "name": "my-ide-mobile-terminal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Mobile-friendly cloud terminal built with full xterm.js + touch key bar (Ctrl, Alt, arrows, etc.) for phones that can't use cloud VS Code's terminal",
   "type": "module",
   "main": "server.js",

@@ -17,6 +17,10 @@
     <span id="status-text">connecting…</span>
     <span class="spacer"></span>
     <button id="btn-search" title="Search terminal output">🔍</button>
+    <button id="btn-select" title="Select mode: drag on the terminal to select text">✂️</button>
+    <button id="btn-select-all" title="Select all output">⧉</button>
+    <button id="btn-copy" title="Copy selected text">📋</button>
+    <button id="btn-paste" title="Paste from clipboard">📥</button>
     <button id="btn-clear" title="Clear screen">🧹</button>
     <button id="btn-keyboard" title="Open phone keyboard">⌨️</button>
     <button id="btn-reconnect" title="Reconnect">↻</button>
@@ -153,6 +157,7 @@
   </footer>
 
   <!-- FULL xterm.js stack, every installed package is loaded (nothing left out) -->
+  <div id="toast" role="status" aria-live="polite"></div>
   <script src="/xterm/xterm.js"></script>
   <script src="/xterm/addon-attach.js"></script>
   <script src="/xterm/addon-fit.js"></script>

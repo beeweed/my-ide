@@ -15,6 +15,10 @@ myc
 `myc` starts the app and prints only the frontend URL, e.g.
 `http://localhost:3000`. Options: `myc --port 4000`, `myc --help`.
 
+On the phone: tap ✂️ for select mode (drag to select text), ⧉ for
+select-all, 📋 to copy, 📥 to paste, and tap any URL to open it in a
+new browser tab.
+
 ## Run from source
 
 ```bash
