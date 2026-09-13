@@ -39,3 +39,4 @@ phone keyboard (⌨️ button) or the side keys.
   symbol quick-bar on top, thumb bar at the bottom. All xterm.js packages
   are loaded: core, fit, attach, search, serialize, unicode11, web-links,
   webgl (+ canvas fallback), image, progress.
+  version = 1.1.0
